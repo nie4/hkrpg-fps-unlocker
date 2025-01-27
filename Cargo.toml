@@ -1,0 +1,20 @@
+[package]
+name = "hkrpg-fps-unlocker"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "fpsunlocker"
+crate-type = ["cdylib"]
+
+[dependencies]
+windows = {version = "0.59", features = [
+    "Win32_System_SystemServices",
+    "Win32_System_LibraryLoader",
+]}
+
+[profile.release]
+strip = true      # Automatically strip symbols from the binary.
+lto = true        # Link-time optimization.
+opt-level = 3     # Optimize for speed.
+codegen-units = 1 # Maximum size reduction optimizations.
