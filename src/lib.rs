@@ -1,34 +1,29 @@
-use functions::{set_target_frame_rate, set_vsync_count};
 use std::{sync::LazyLock, time::Duration};
 use windows::core::s;
 use windows::Win32::System::{LibraryLoader::GetModuleHandleA, SystemServices::DLL_PROCESS_ATTACH};
 
-mod functions;
-mod offsets;
-
-pub static GAMEASSEMBLY_BASE: LazyLock<usize> = LazyLock::new(|| unsafe {
+static UNITYPLAYER: LazyLock<usize> = LazyLock::new(|| unsafe {
     loop {
-        match GetModuleHandleA(s!("GameAssembly.dll")) {
+        match GetModuleHandleA(s!("UnityPlayer.dll")) {
             Ok(handle) => break handle.0 as usize,
             Err(_) => std::thread::sleep(Duration::from_millis(100)),
         }
     }
 });
 
-// Change these values
-const VSYNC_COUNT: i32 = 0;
+const OFFSET: usize = 0x1C9A8D0;
+
+// Change this value
 const TARGET_FRAMERATE: i32 = 144;
 
 unsafe fn main_thread() {
-    let _ = &*GAMEASSEMBLY_BASE;
+    let unity_player = &*UNITYPLAYER;
+
+    let fps_value = unity_player.wrapping_add(OFFSET) as *mut i32;
 
     loop {
         std::thread::sleep(Duration::from_secs(5));
-        set_vsync_count(VSYNC_COUNT);
-
-        if VSYNC_COUNT == 0 {
-            set_target_frame_rate(TARGET_FRAMERATE);
-        }
+        *fps_value = TARGET_FRAMERATE;
     }
 }
 
