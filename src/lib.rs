@@ -1,23 +1,20 @@
-use std::{sync::LazyLock, time::Duration};
+use ctor::ctor;
+use std::time::Duration;
 use windows::core::s;
-use windows::Win32::System::{LibraryLoader::GetModuleHandleA, SystemServices::DLL_PROCESS_ATTACH};
+use windows::Win32::System::LibraryLoader::GetModuleHandleA;
 
-static UNITYPLAYER: LazyLock<usize> = LazyLock::new(|| unsafe {
-    loop {
-        match GetModuleHandleA(s!("UnityPlayer.dll")) {
-            Ok(handle) => break handle.0 as usize,
-            Err(_) => std::thread::sleep(Duration::from_millis(100)),
-        }
-    }
-});
-
-const OFFSET: usize = 0x1C9A8D0;
+const OFFSET: usize = 0x1CE8610;
 
 // Change this value
 const TARGET_FRAMERATE: i32 = 144;
 
-unsafe fn main_thread() {
-    let unity_player = &*UNITYPLAYER;
+unsafe fn unlocker_thread() {
+    let unity_player = loop {
+        match GetModuleHandleA(s!("UnityPlayer.dll")) {
+            Ok(handle) => break handle.0 as usize,
+            Err(_) => std::thread::sleep(Duration::from_millis(100)),
+        }
+    };
 
     let fps_value = unity_player.wrapping_add(OFFSET) as *mut i32;
 
@@ -27,11 +24,7 @@ unsafe fn main_thread() {
     }
 }
 
-#[no_mangle]
-unsafe extern "system" fn DllMain(_: *const u8, call_reason: u32, _: *const u8) -> u32 {
-    if call_reason == DLL_PROCESS_ATTACH {
-        std::thread::spawn(|| main_thread());
-    }
-
-    1
+#[ctor]
+unsafe fn main() {
+    std::thread::spawn(|| unlocker_thread());
 }
