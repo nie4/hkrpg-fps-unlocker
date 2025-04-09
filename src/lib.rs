@@ -3,7 +3,7 @@ use std::time::Duration;
 use windows::core::s;
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
 
-const OFFSET: usize = 0x1CE8610;
+const OFFSET: usize = 0x1CF65D0;
 
 // Change this value
 const TARGET_FRAMERATE: i32 = 144;
