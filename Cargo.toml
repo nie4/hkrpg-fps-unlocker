@@ -1,17 +1,17 @@
 [package]
 name = "hkrpg-fps-unlocker"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [lib]
 name = "fpsunlocker"
 crate-type = ["cdylib"]
 
 [dependencies]
-windows = {version = "0.59", features = [
+windows = {version = "0.61.3", features = [
     "Win32_System_LibraryLoader",
 ]}
-ctor = "0.3.6"
+ctor = "0.4.2"
 
 [profile.release]
 strip = true      # Automatically strip symbols from the binary.

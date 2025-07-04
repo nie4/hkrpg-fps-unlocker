@@ -1,5 +1,5 @@
 # hkrpg-fps-unlocker
-FPS unlocker for StarRail ```OSPROD v3.3.0```
+FPS unlocker for StarRail ```OSPROD v3.4.0```
 
 ## Requirements:
 - [Rust](https://www.rust-lang.org/tools/install)
